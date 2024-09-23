@@ -3,6 +3,7 @@ package sign_up;
 import connect_to_db.Connect_db;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +28,17 @@ public class Sign_Up {
         return sb.toString();
     }
 
+    // Method to check if the email already exists
+    private boolean emailExists(Connection connection) throws SQLException {
+        String sql = "SELECT email FROM users WHERE email = ?";
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, this.email);
+        ResultSet resultSet = statement.executeQuery();
+
+        // If the result set has any rows, the email exists
+        return resultSet.next();
+    }
+
     // Method to add a new account to the database
     public void add_new_account() {
         try {
@@ -34,22 +46,27 @@ public class Sign_Up {
             Connect_db dbConnection = new Connect_db();
             Connection connection = dbConnection.getConnection();
 
-            // Hash the password
-            String hashedPassword = hashPassword(this.password);
+            // Check if the email already exists
+            if (emailExists(connection)) {
+                System.out.println("This email is already registered. Please use another email.");
+            } else {
+                // Hash the password
+                String hashedPassword = hashPassword(this.password);
 
-            // Prepare SQL statement to insert new user
-            String sql = "INSERT INTO users (email, password) VALUES (?, ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+                // Prepare SQL statement to insert new user
+                String sql = "INSERT INTO users (email, password) VALUES (?, ?)";
+                PreparedStatement statement = connection.prepareStatement(sql);
 
-            // Set parameters for the prepared statement
-            statement.setString(1, this.email);
-            statement.setString(2, hashedPassword);
+                // Set parameters for the prepared statement
+                statement.setString(1, this.email);
+                statement.setString(2, hashedPassword);
 
-            // Execute the update
-            int rowsInserted = statement.executeUpdate();
+                // Execute the update
+                int rowsInserted = statement.executeUpdate();
 
-            if (rowsInserted > 0) {
-                System.out.println("A new user has been added successfully!");
+                if (rowsInserted > 0) {
+                    System.out.println("A new user has been added successfully!");
+                }
             }
 
             // Close the database connection
