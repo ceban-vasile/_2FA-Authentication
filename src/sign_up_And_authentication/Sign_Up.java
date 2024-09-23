@@ -11,10 +11,12 @@ import java.security.NoSuchAlgorithmException;
 public class Sign_Up {
     private String email;
     private String password;
+    private String secret;
 
     public Sign_Up(String email, String password) {
         this.email = email;
         this.password = password;
+        this.secret = TwoFA.generateSecret();
     }
 
     // Method to hash the password
@@ -54,12 +56,13 @@ public class Sign_Up {
                 String hashedPassword = hashPassword(this.password);
 
                 // Prepare SQL statement to insert new user
-                String sql = "INSERT INTO users (email, password) VALUES (?, ?)";
+                String sql = "INSERT INTO users (email, password, secret) VALUES (?, ?, ?)";
                 PreparedStatement statement = connection.prepareStatement(sql);
 
                 // Set parameters for the prepared statement
                 statement.setString(1, this.email);
                 statement.setString(2, hashedPassword);
+                statement.setString(3, secret);
 
                 // Execute the update
                 int rowsInserted = statement.executeUpdate();
