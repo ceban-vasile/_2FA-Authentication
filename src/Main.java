@@ -1,10 +1,13 @@
-import connect_to_db.Connect_db;
-import sign_up.Sign_Up;
+import Servers.JavaServer;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        // Initialize the Sign_up object
-        Sign_Up dbAddNewUser = new Sign_Up("ceban.vasea20@gmail.com","vasile");
-        dbAddNewUser.add_new_account();
+        try {
+            // Initialize the JavaServer to start listening for HTTP requests
+            JavaServer objServer = new JavaServer(); // Correct instantiation
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
